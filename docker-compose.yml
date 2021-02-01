@@ -23,8 +23,6 @@ services:
       restart: always
       networks:
          - sso-network
-      volumes:
-         - ./web:/sso
    sso-nginx:
       container_name: sso-nginx
       build: ./nginx
