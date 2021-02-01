@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+   sso-app:
+      container_name: sso-app
+      build: ./app
+      restart: always
+      networks:
+         - sso-network
+      depends_on:
+         - sso-database
+      environment:
+         - JWT_SECRET=qFcD7RTGXMchKijLW_vwYDy5
+         - FACEBOOK_CLIENT_ID=facebook_client_id
+         - FACEBOOK_CLIENT_SECRET=facebook_client_secret
+         - GITHUB_CLIENT_ID=github_client_id
+         - GITHUB_CLIENT_SECRET=github_client_secret
+         - GOOGLE_CLIENT_ID=google_client_id
+         - GOOGLE_CLIENT_SECRET=google_client_secret
+   sso-web:
+      container_name: sso-web
+      build: ./web
+      restart: always
+      networks:
+         - sso-network
+      volumes:
+         - ./web:/sso
+   sso-nginx:
+      container_name: sso-nginx
+      build: ./nginx
+      restart: always
+      ports:
+         - 80:80
+         - 443:443
+      networks:
+         - sso-network
+      depends_on:
+         - sso-app
+         - sso-web
+   sso-database:
+      image: postgres:13-alpine
+      container_name: sso-database
+      restart: always
+      volumes:
+         - /var/lib/postgresql/data
+      networks:
+         - sso-network
+      environment:
+         - POSTGRES_DB=sso
+         - POSTGRES_USER=sso
+         - POSTGRES_PASSWORD=sso
+
+networks:
+   sso-network:
+
